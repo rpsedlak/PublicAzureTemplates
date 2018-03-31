@@ -4,19 +4,31 @@
     "parameters": {
         "environmentBaseName": {
             "type": "string",
-            "maxLength": 12
+            "maxLength": 12,
+            "metadata": {
+                "description": "This will be the start of all the Azure resource names. The VM, virtual network, network security group, and others will be created using this name. It is limited to 12 characters."
+            }
         },
         "adminUsername": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+                "description": "This is the admin user name for the VM that is created. 'Admin' and 'administrator' are reserved by Azure and may not be used."
+            }
         },
         "adminPassword": {
-            "type": "securestring"
+            "type": "securestring",
+            "metadata": {
+                "description": "Password should be 12 characters or more and contain at least one uppercase, one lowercase, a number, and a symbol."
+            }
         },
         "numberOfVirtualMachines": {
             "type": "int",
             "minValue": 1,
             "maxValue": 9,
-            "defaultValue": 1
+            "defaultValue": 1,
+            "metadata": {
+                "description": "Change this value to build up to 9 virtual machines in this simulation environment."
+            }
         }
     },
     "variables": {
@@ -150,7 +162,7 @@
             }
         },
         {
-            "name": "subnet-nsg",
+            "name": "[concat(parameters('environmentBaseName'),'-nsg')]",
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2017-06-01",
             "location": "[variables('location')]",
@@ -179,7 +191,7 @@
             "type": "Microsoft.Network/virtualNetworks",
             "location": "[variables('location')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/networkSecurityGroups','subnet-nsg')]"
+                "[resourceId('Microsoft.Network/networkSecurityGroups',concat(parameters('environmentBaseName'),'-nsg'))]"
             ],
             "properties": {
                 "addressSpace":{
@@ -193,7 +205,7 @@
                         "properties": {
                             "addressPrefix": "[variables('VNET').addressSpace]",
                             "networkSecurityGroup": {
-                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups','subnet-nsg')]"
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups',concat(parameters('environmentBaseName'),'-nsg'))]"
                             }
                         }
                     }
